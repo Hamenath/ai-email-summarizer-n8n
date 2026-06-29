@@ -1,0 +1,137 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e1940995-9da8-4250-9ee8-60de88dc2808",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "L8SqbSM7fNk4VlTI",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an email assistant.\n\nSummarize this email in 3 bullet points.\n\nIMPORTANT:\n- Return plain text only.\n- Do not use Markdown.\n- Do not use HTML.\n- Do not use *, **, _, or backticks.\n\nSubject:\n{{$json.Subject}}\n\nFrom:\n{{$json.From}}\n\nContent:\n{{$json.snippet}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        240,
+        0
+      ],
+      "id": "6e578a67-36d4-4177-b80c-7bdb897f021b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        240
+      ],
+      "id": "56ac030a-fe8b-48c1-b777-18fd606173f1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lFCTRdlQOApW9qSl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6688081582",
+        "text": "=📧 New Email Summary  {{$json.text}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "af096d2f-08b2-40c2-8e43-3ececda46288",
+      "name": "Send a text message",
+      "webhookId": "60b1bd3b-d90c-4efb-b230-6253f04c8eb0",
+      "credentials": {
+        "telegramApi": {
+          "id": "4ubhiKQ13bgZiBzv",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7d620158-f874-4b1b-b5c9-7799f929b207",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "511c3734d60b21f2f741fa8217c18fd09aeb9a7336270d290cf746733be96af6"
+  },
+  "nodeGroups": [],
+  "id": "rzcc1istsVTTgLFC",
+  "tags": []
+}
